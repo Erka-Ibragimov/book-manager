@@ -1,0 +1,46 @@
+services:
+  book-manager:
+   build: .
+   restart: always
+   ports:
+    - "3000:3000"
+   environment:
+    - PORT=3000
+    - NODE_ENV=development
+    - REDIS_HOST=redis
+    - REDIS_PORT=6379
+    - REDIS_TTL=60000
+    - JWT_SECRET=TEST
+    - DATABASE_URL=postgres://postgres:root123@postgres:5432/postgres
+   depends_on:
+    - postgres
+    - redis
+   networks:
+    - app-network
+  redis:
+    image: redis:6-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: root123
+      POSTGRES_DATABASE: postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
